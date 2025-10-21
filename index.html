@@ -209,33 +209,33 @@
       };
     }
 
-    // ENVIO DE DADOS - FUNCIONA NO GITHUB PAGES
+    // ENVIO DE DADOS - funciona no GitHub Pages sem preflight
     async function enviarDados(event){
       event.preventDefault();
-      
+  
       const dados = coletarDados();
       if(!validarFormulario(dados)) return;
-      
+  
       const submitButton = document.querySelector('input[type="submit"]');
       const msgDiv = document.getElementById('msg');
-      
+  
       submitButton.disabled = true;
       submitButton.value = 'Enviando...';
       msgDiv.textContent = '';
       msgDiv.className = 'msg';
 
       try {
+    // NOTE: NÃO enviar headers personalizados nem Content-Type application/json
+    // para evitar preflight OPTIONS. O Apps Script receberá e.postData.contents.
         const response = await fetch(WEBAPP_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify(dados),
           redirect: 'follow'
         });
 
+    // ainda pode lançar se a rede falhar
         const result = await response.json();
-        
+    
         if(result.success) {
           msgDiv.textContent = result.message;
           msgDiv.className = 'msg';
@@ -245,7 +245,7 @@
           msgDiv.textContent = result.message || '❌ Erro ao enviar o formulário.';
           msgDiv.className = 'msg error';
         }
-        
+    
       } catch(err) {
         console.error('Erro:', err);
         msgDiv.textContent = '❌ Erro ao enviar o formulário. Tente novamente.';
@@ -255,6 +255,7 @@
         submitButton.value = 'Enviar';
       }
     }
+
   </script>
 </head>
 
